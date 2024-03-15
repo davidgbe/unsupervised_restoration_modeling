@@ -1,0 +1,13 @@
+figures/**/*
+robustness/**/*
+data/**/*
+**/__pycache__/**/*
+__pycache__/**/*
+python-env/
+.ipynb_checkpoints/**/*
+slurm*
+submit_klone_*
+*.zip
+**/*.csv
+.ipynb_checkpoints
+paper/**/*
