@@ -209,8 +209,8 @@ def run(m, output_dir_name, dropout={'E': 0, 'I': 0}, w_r_e=None, w_r_i=None):
     output_dir = f'./figures/{output_dir_name}'
     os.makedirs(output_dir)
 
-    robustness_output_dir = f'./robustness/{output_dir_name}'
-    os.makedirs(robustness_output_dir)
+    data_output_dir = f'./data/{output_dir_name}'
+    os.makedirs(data_output_dir)
     
     w_u_proj = np.diag(np.ones(m.N_DRIVING_CELLS)) * m.W_U_E * 0.5
     w_u_uva = np.diag(np.ones(m.N_EXC_OLD - m.N_DRIVING_CELLS)) * m.W_U_E * 0.15 # initially 0.25
@@ -428,7 +428,7 @@ def run(m, output_dir_name, dropout={'E': 0, 'I': 0}, w_r_e=None, w_r_i=None):
             x[int(offset/S.DT):int(offset/S.DT) + int(dur/S.DT)] = np.random.poisson(lam=50 * S.DT, size=int(dur/S.DT)) # initially 10
             return x
 
-        spks_u[:, m.N_DRIVING_CELLS:m.N_EXC_OLD] = np.stack([make_poisson_input(offset=m.INPUT_DELAY) for i in range(m.N_EXC_OLD - m.N_DRIVING_CELLS)]).T
+        # spks_u[:, m.N_DRIVING_CELLS:m.N_EXC_OLD] = np.stack([make_poisson_input(offset=m.INPUT_DELAY) for i in range(m.N_EXC_OLD - m.N_DRIVING_CELLS)]).T
 
         ntwk = LIFNtwkG(
             c_m=c_m,
@@ -681,14 +681,14 @@ def run(m, output_dir_name, dropout={'E': 0, 'I': 0}, w_r_e=None, w_r_i=None):
 
             save_freq = 100
             if i_e % save_freq == (save_freq - 1):
-                sio.savemat(robustness_output_dir + '/' + f'title_{args.title[0]}_idx_{zero_pad(i_e, 4)}', {'data': batched_data_to_save})
+                sio.savemat(data_output_dir + '/' + f'title_{args.title[0]}_idx_{zero_pad(i_e, 4)}', {'data': batched_data_to_save})
                 batched_data_to_save = []
 
             fig_save_freq = 1 if args.env == 'local' else 1000
             if i_e % fig_save_freq == 0:
                 fig.savefig(f'{output_dir}/{zero_pad(i_e, 4)}.png')
 
-        log_file = open(os.path.join(robustness_output_dir, 'log'), 'a+')
+        log_file = open(os.path.join(data_output_dir, 'log'), 'a+')
 
         end = time.time()
         secs_per_cycle = f'{end - start}'
@@ -735,7 +735,7 @@ w_r_i = None
 
 # Load previous saved weight matrices if applicable
 if args.load_run is not None:
-    loaded = load_previous_run(os.path.join('./robustness', args.load_run[0]), int(args.load_run[1]))
+    loaded = load_previous_run(os.path.join('./data', args.load_run[0]), int(args.load_run[1]))
     w_r_e = np.array(loaded['w_r_e'].todense())
     w_r_i = np.array(loaded['w_r_i'].todense())
 
